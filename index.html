@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BiblioTech - Sistema de Gestão de Biblioteca</title>
+    <!-- Ícones FontAwesome via CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --bg-light: #f1f5f9;
+            --white: #ffffff;
+            --text-dark: #1e293b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+
+        /* TELA DE LOGIN */
+        #login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, var(--primary) 0%, #0f172a 100%);
+        }
+
+        .login-box {
+            background: var(--white);
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-box h1 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-box p {
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.4rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            padding: 0.7rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary { background: var(--primary); color: var(--white); }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-success { background: var(--success); color: var(--white); }
+        .btn-danger { background: var(--danger); color: var(--white); }
+        .btn-secondary { background: var(--secondary); color: var(--white); }
+        .btn-block { width: 100%; justify-content: center; }
+
+        /* LAYOUT PRINCIPAL */
+        #app-screen {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: #0f172a;
+            color: var(--white);
+            position: fixed;
+            height: 100vh;
+            padding: 1.5rem 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid #1e293b;
+            font-size: 1.4rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #38bdf8;
+        }
+
+        .user-info {
+            padding: 1rem 1.5rem;
+            background: #1e293b;
+            margin: 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+        }
+
+        .user-info span {
+            display: block;
+            color: #94a3b8;
+            font-size: 0.75rem;
+            margin-top: 3px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            flex: 1;
+        }
+
+        .nav-item {
+            padding: 0.9rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #cbd5e1;
+            transition: 0.2s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 2rem;
+            width: calc(100% - 260px);
+        }
+
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: var(--white);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        /* CARDS DASHBOARD */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-card.success { border-left-color: var(--success); }
+        .stat-card.warning { border-left-color: var(--warning); }
+        .stat-card.danger { border-left-color: var(--danger); }
+
+        .stat-info h3 { font-size: 2rem; margin-bottom: 0.2rem; }
+        .stat-info p { color: var(--secondary); font-size: 0.9rem; }
+        .stat-icon { font-size: 2.5rem; opacity: 0.2; }
+
+        /* SEÇÕES E TABELAS */
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.9rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th { background: #f8fafc; font-weight: 600; color: var(--secondary); }
+
+        .badge {
+            padding: 0.3rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .badge-success { background: #dcfce7; color: var(--success); }
+        .badge-danger { background: #fee2e2; color: var(--danger); }
+        .badge-warning { background: #fef3c7; color: var(--warning); }
+
+        /* SWITCH LEITOR DE CÓDIGO DE BARRAS */
+        .barcode-toggle {
+            background: #e0f2fe;
+            border: 1px solid #bae6fd;
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .scanner-active-box {
+            border: 2px dashed var(--primary);
+            background: #eff6ff;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <!-- TELA DE LOGIN -->
+    <div id="login-screen">
+        <div class="login-box">
+            <h1><i class="fas fa-book-reader"></i> BiblioTech</h1>
+            <p>Sistema de Gestão de Acervo e Empréstimos</p>
+            <form id="login-form">
+                <div class="form-group">
+                    <label>Usuário</label>
+                    <input type="text" id="login-user" class="form-control" placeholder="admin ou biblio" required>
+                </div>
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="login-pass" class="form-control" placeholder="123" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Entrar no Sistema</button>
+            </form>
+            <div style="margin-top: 1.5rem; font-size: 0.8rem; color: #64748b; text-align: left; background: #f8fafc; padding: 10px; border-radius: 6px;">
+                <strong>Credenciais de Teste:</strong><br>
+                Admin: <code>admin</code> / Senha: <code>123</code><br>
+                Bibliotecário: <code>biblio</code> / Senha: <code>123</code>
+            </div>
+        </div>
+    </div>
+
+    <!-- SISTEMA PRINCIPAL -->
+    <div id="app-screen">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="brand">
+                <i class="fas fa-book-open"></i> BiblioTech
+            </div>
+            <div class="user-info">
+                <strong id="logged-user-name">Nome do Usuário</strong>
+                <span id="logged-user-role">Cargo</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item active" onclick="navigate('dashboard')">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </li>
+                <li class="nav-item" onclick="navigate('loans')">
+                    <i class="fas fa-exchange-alt"></i> Empréstimos / Devoluções
+                </li>
+                <li class="nav-item" onclick="navigate('books')">
+                    <i class="fas fa-book"></i> Cadastro de Livros
+                </li>
+                <li class="nav-item" onclick="navigate('readers')">
+                    <i class="fas fa-users"></i> Leitores / Usuários
+                </li>
+                <!-- Menu Exclusivo Admin -->
+                <li class="nav-item admin-only" onclick="navigate('staff')">
+                    <i class="fas fa-user-shield"></i> Equipe (Admin)
+                </li>
+            </ul>
+            <div style="padding: 1rem;">
+                <button onclick="logout()" class="btn btn-danger btn-block">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </button>
+            </div>
+        </aside>
+
+        <!-- CONTEÚDO PRINCIPAL -->
+        <main class="main-content">
+            <div class="header-bar">
+                <h2 id="page-title">Dashboard Geral</h2>
+                <div id="current-date" style="color: var(--secondary); font-weight: 500;"></div>
+            </div>
+
+            <!-- 1. DASHBOARD -->
+            <section id="sec-dashboard" class="section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <h3 id="stat-total-books">0</h3>
+                            <p>Total de Livros (Exemplares)</p>
+                        </div>
+                        <i class="fas fa-book stat-icon"></i>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-info">
+                            <h3 id="stat-total-readers">0</h3>
+                            <p>Leitores Cadastrados</p>
+                        </div>
+                        <i class="fas fa-users stat-icon"></i>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-info">
+                            <h3 id="stat-active-loans">0</h3>
+                            <p>Empréstimos Ativos</p>
+                        </div>
+                        <i class="fas fa-hand-holding-heart stat-icon"></i>
+                    </div>
+                    <div class="stat-card danger">
+                        <div class="stat-info">
+                            <h3 id="stat-overdue-loans">0</h3>
+                            <p>Devoluções em Atraso</p>
+                        </div>
+                        <i class="fas fa-exclamation-triangle stat-icon"></i>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-clock"></i> Controle de Prazos e Devoluções Pendentes</h3>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Livro</th>
+                                <th>Leitor</th>
+                                <th>Data Empréstimo</th>
+                                <th>Data Entrega</th>
+                                <th>Status</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashboard-loans-table"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 2. EMPRÉSTIMOS E DEVOLUÇÕES -->
+            <section id="sec-loans" class="section">
+                <!-- Toggle Modo Leitor de Código de Barras -->
+                <div class="barcode-toggle">
+                    <input type="checkbox" id="barcode-mode-toggle" style="width: 20px; height: 20px; cursor: pointer;" onchange="toggleBarcodeMode()">
+                    <label for="barcode-mode-toggle" style="cursor: pointer; font-weight: bold; color: var(--primary-dark);">
+                        <i class="fas fa-barcode"></i> Ativar Modo Leitor de Código de Barras (USB/Laser)
+                    </label>
+                </div>
+
+                <!-- MODO COM LEITOR DE CÓDIGO DE BARRAS -->
+                <div id="barcode-loan-panel" class="card scanner-active-box hidden">
+                    <div class="card-header">
+                        <h3><i class="fas fa-barcode"></i> Operação Rápida por Código de Barras</h3>
+                    </div>
+                    <p style="margin-bottom: 1rem; font-size: 0.9rem; color: var(--secondary);">
+                        Posicione o cursor no campo abaixo e bipe o código de barras do livro. O sistema identificará se é um novo empréstimo ou uma devolução.
+                    </p>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>1. Bipar Código de Barras / ISBN do Livro</label>
+                            <input type="text" id="scan-book-input" class="form-control" placeholder="Aguardando leitura..." autofocus>
+                        </div>
+                        <div class="form-group" id="scan-reader-group">
+                            <label>2. Bipar Carteirinha do Leitor (CPF/Matrícula)</label>
+                            <input type="text" id="scan-reader-input" class="form-control" placeholder="Código do leitor...">
+                        </div>
+                        <div class="form-group">
+                            <label>Data Prevista de Entrega</label>
+                            <input type="date" id="scan-due-date" class="form-control">
+                        </div>
+                    </div>
+                    <button onclick="processBarcodeAction()" class="btn btn-primary"><i class="fas fa-check"></i> Confirmar Operação</button>
+                </div>
+
+                <!-- MODO MANUAL (SEM LEITOR) -->
+                <div id="manual-loan-panel" class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-plus-circle"></i> Novo Empréstimo Manual</h3>
+                    </div>
+                    <form id="loan-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Selecione o Leitor</label>
+                                <select id="loan-reader" class="form-control" required></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Selecione o Livro (Disponíveis)</label>
+                                <select id="loan-book" class="form-control" required></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Data de Empréstimo</label>
+                                <input type="date" id="loan-date" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Data de Entrega (Devolução)</label>
+                                <input type="date" id="loan-due-date" class="form-control" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
+                            <i class="fas fa-save"></i> Registrar Empréstimo
+                        </button>
+                    </form>
+                </div>
+
+                <!-- HISTÓRICO DE EMPRÉSTIMOS -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Histórico Completo de Empréstimos</h3>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cód. Barras</th>
+                                <th>Livro</th>
+                                <th>Leitor</th>
+                                <th>Retirada</th>
+                                <th>Entrega Prevista</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="loans-table-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 3. CADASTRO DE LIVROS -->
+            <section id="sec-books" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Cadastrar Novo Livro</h3>
+                    </div>
+                    <form id="book-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Código de Barras / ISBN</label>
+                                <input type="text" id="book-barcode" class="form-control" placeholder="Ex: 9788535902778" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Título do Livro</label>
+                                <input type="text" id="book-title" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Autor</label>
+                                <input type="text" id="book-author" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Categoria</label>
+                                <input type="text" id="book-category" class="form-control" placeholder="Ex: Ficção, Técnico..." required>
+                            </div>
+                            <div class="form-group">
+                                <label>Quantidade em Estoque</label>
+                                <input type="number" id="book-qty" class="form-control" min="1" value="1" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
+                            <i class="fas fa-plus"></i> Adicionar ao Acervo
+                        </button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Acervo Cadastrado</h3>
+                        <input type="text" id="search-book" class="form-control" style="max-width: 300px;" placeholder="Buscar por título ou código..." onkeyup="renderBooks()">
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Cód. Barras</th>
+                                <th>Título</th>
+                                <th>Autor</th>
+                                <th>Categoria</th>
+                                <th>Disponíveis / Total</th>
+                                <th class="admin-only">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="books-table-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 4. CADASTRO DE LEITORES / USUÁRIOS -->
+            <section id="sec-readers" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Cadastrar Leitor</h3>
+                    </div>
+                    <form id="reader-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Código / Matrícula (Para Leitor)</label>
+                                <input type="text" id="reader-code" class="form-control" placeholder="Ex: 1001" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Nome Completo</label>
+                                <input type="text" id="reader-name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>E-mail</label>
+                                <input type="email" id="reader-email" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Telefone / WhatsApp</label>
+                                <input type="text" id="reader-phone" class="form-control" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
+                            <i class="fas fa-user-plus"></i> Cadastrar Leitor
+                        </button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Leitores Cadastrados</h3>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Matrícula</th>
+                                <th>Nome</th>
+                                <th>E-mail</th>
+                                <th>Telefone</th>
+                                <th class="admin-only">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="readers-table-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 5. PAINEL ADMINISTRADOR (EQUIPE) -->
+            <section id="sec-staff" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-user-shield"></i> Gerenciar Acessos (Admin e Bibliotecários)</h3>
+                    </div>
+                    <form id="staff-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Nome do Funcionário</label>
+                                <input type="text" id="staff-name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Login de Acesso</label>
+                                <input type="text" id="staff-user" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Senha</label>
+                                <input type="password" id="staff-pass" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Perfil de Acesso</label>
+                                <select id="staff-role" class="form-control">
+                                    <option value="bibliotecario">Bibliotecário</option>
+                                    <option value="admin">Administrador</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">
+                            <i class="fas fa-save"></i> Criar Acesso
+                        </button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Usuários do Sistema</h3>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Login</th>
+                                <th>Perfil</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="staff-table-body"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // ==========================================
+        // BANCO DE DADOS INICIAL (LOCALSTORAGE)
+        // ==========================================
+        const DB_KEYS = {
+            STAFF: 'biblio_staff',
+            BOOKS: 'biblio_books',
+            READERS: 'biblio_readers',
+            LOANS: 'biblio_loans',
+            SESSION: 'biblio_session'
+        };
+
+        function initDB() {
+            if (!localStorage.getItem(DB_KEYS.STAFF)) {
+                const initialStaff = [
+                    { id: 1, name: 'Administrador Geral', user: 'admin', pass: '123', role: 'admin' },
+                    { id: 2, name: 'Maria Bibliotecária', user: 'biblio', pass: '123', role: 'bibliotecario' }
+                ];
+                localStorage.setItem(DB_KEYS.STAFF, JSON.stringify(initialStaff));
+            }
+
+            if (!localStorage.getItem(DB_KEYS.BOOKS)) {
+                const initialBooks = [
+                    { id: 1, barcode: '789001', title: 'Dom Casmurro', author: 'Machado de Assis', category: 'Literatura', totalQty: 3, availableQty: 2 },
+                    { id: 2, barcode: '789002', title: 'Clean Code', author: 'Robert C. Martin', category: 'Tecnologia', totalQty: 2, availableQty: 2 },
+                    { id: 3, barcode: '789003', title: 'O Pequeno Príncipe', author: 'Antoine de Saint-Exupéry', category: 'Infantil', totalQty: 5, availableQty: 4 }
+                ];
+                localStorage.setItem(DB_KEYS.BOOKS, JSON.stringify(initialBooks));
+            }
+
+            if (!localStorage.getItem(DB_KEYS.READERS)) {
+                const initialReaders = [
+                    { id: 1, code: '1001', name: 'João Silva', email: 'joao@email.com', phone: '(11) 99999-1111' },
+                    { id: 2, code: '1002', name: 'Ana Oliveira', email: 'ana@email.com', phone: '(11) 98888-2222' }
+                ];
+                localStorage.setItem(DB_KEYS.READERS, JSON.stringify(initialReaders));
+            }
+
+            if (!localStorage.getItem(DB_KEYS.LOANS)) {
+                // Criar um empréstimo ativo e um atrasado para demonstração
+                const today = new Date();
+                const pastDate = new Date(); pastDate.setDate(today.getDate() - 10);
+                const overdueDate = new Date(); overdueDate.setDate(today.getDate() - 2);
+                const futureDate = new Date(); futureDate.setDate(today.getDate() + 7);
+
+                const initialLoans = [
+                    {
+                        id: 101,
+                        bookId: 1,
+                        readerId: 1,
+                        loanDate: pastDate.toISOString().split('T')[0],
+                        dueDate: overdueDate.toISOString().split('T')[0],
+                        status: 'ativo'
+                    },
+                    {
+                        id: 102,
+                        bookId: 3,
+                        readerId: 2,
+                        loanDate: today.toISOString().split('T')[0],
+                        dueDate: futureDate.toISOString().split('T')[0],
+                        status: 'ativo'
+                    }
+                ];
+                localStorage.setItem(DB_KEYS.LOANS, JSON.stringify(initialLoans));
+            }
+        }
+
+        const getData = (key) => JSON.parse(localStorage.getItem(key)) || [];
+        const saveData = (key, data) => localStorage.setItem(key, JSON.stringify(data));
+
+        // ==========================================
+        // AUTENTICAÇÃO E PERMISSÕES
+        // ==========================================
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const user = document.getElementById('login-user').value.trim();
+            const pass = document.getElementById('login-pass').value.trim();
+
+            const staffList = getData(DB_KEYS.STAFF);
+            const found = staffList.find(s => s.user === user && s.pass === pass);
+
+            if (found) {
+                sessionStorage.setItem(DB_KEYS.SESSION, JSON.stringify(found));
+                checkSession();
+            } else {
+                alert('Usuário ou senha inválidos!');
+            }
+        });
+
+        function checkSession() {
+            const session = JSON.parse(sessionStorage.getItem(DB_KEYS.SESSION));
+            if (session) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('app-screen').style.display = 'flex';
+                document.getElementById('logged-user-name').innerText = session.name;
+                document.getElementById('logged-user-role').innerText = session.role === 'admin' ? 'Administrador' : 'Bibliotecário';
+
+                // Controle de permissão (Admin vs Bibliotecário)
+                const adminElements = document.querySelectorAll('.admin-only');
+                adminElements.forEach(el => {
+                    if (session.role !== 'admin') {
+                        el.classList.add('hidden');
+                    } else {
+                        el.classList.remove('hidden');
+                    }
+                });
+
+                updateAllViews();
+            } else {
+                document.getElementById('login-screen').style.display = 'flex';
+                document.getElementById('app-screen').style.display = 'none';
+            }
+        }
+
+        function logout() {
+            sessionStorage.removeItem(DB_KEYS.SESSION);
+            checkSession();
+        }
+
+        // ==========================================
+        // NAVEGAÇÃO
+        // ==========================================
+        function navigate(sectionId) {
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+
+            document.getElementById(`sec-${sectionId}`).classList.add('active');
+            event.currentTarget.classList.add('active');
+
+            const titles = {
+                dashboard: 'Dashboard Geral',
+                loans: 'Controle de Empréstimos e Devoluções',
+                books: 'Gerenciamento de Acervo',
+                readers: 'Cadastro de Leitores',
+                staff: 'Painel do Administrador - Equipe'
+            };
+            document.getElementById('page-title').innerText = titles[sectionId];
+            updateAllViews();
+        }
+
+        // ==========================================
+        // CADASTRO DE LIVROS
+        // ==========================================
+        document.getElementById('book-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const books = getData(DB_KEYS.BOOKS);
+            const barcode = document.getElementById('book-barcode').value.trim();
+
+            if (books.some(b => b.barcode === barcode)) {
+                alert('Já existe um livro cadastrado com este Código de Barras!');
+                return;
+            }
+
+            const qty = parseInt(document.getElementById('book-qty').value);
+            const newBook = {
+                id: Date.now(),
+                barcode: barcode,
+                title: document.getElementById('book-title').value,
+                author: document.getElementById('book-author').value,
+                category: document.getElementById('book-category').value,
+                totalQty: qty,
+                availableQty: qty
+            };
+
+            books.push(newBook);
+            saveData(DB_KEYS.BOOKS, books);
+            this.reset();
+            updateAllViews();
+            alert('Livro cadastrado com sucesso!');
+        });
+
+        function deleteBook(id) {
+            if (confirm('Deseja realmente excluir este livro?')) {
+                let books = getData(DB_KEYS.BOOKS);
+                books = books.filter(b => b.id !== id);
+                saveData(DB_KEYS.BOOKS, books);
+                updateAllViews();
+            }
+        }
+
+        function renderBooks() {
+            const books = getData(DB_KEYS.BOOKS);
+            const search = document.getElementById('search-book').value.toLowerCase();
+            const session = JSON.parse(sessionStorage.getItem(DB_KEYS.SESSION));
+            const tbody = document.getElementById('books-table-body');
+            tbody.innerHTML = '';
+
+            books.filter(b => b.title.toLowerCase().includes(search) || b.barcode.includes(search))
+                 .forEach(book => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${book.barcode}</strong></td>
+                    <td>${book.title}</td>
+                    <td>${book.author}</td>
+                    <td>${book.category}</td>
+                    <td>
+                        <span class="badge ${book.availableQty > 0 ? 'badge-success' : 'badge-danger'}">
+                            ${book.availableQty} / ${book.totalQty}
+                        </span>
+                    </td>
+                    <td class="${session.role !== 'admin' ? 'hidden' : ''}">
+                        <button onclick="deleteBook(${book.id})" class="btn btn-danger" style="padding: 0.4rem 0.7rem;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ==========================================
+        // CADASTRO DE LEITORES
+        // ==========================================
+        document.getElementById('reader-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const readers = getData(DB_KEYS.READERS);
+            const code = document.getElementById('reader-code').value.trim();
+
+            if (readers.some(r => r.code === code)) {
+                alert('Já existe um leitor com esta matrícula/código!');
+                return;
+            }
+
+            const newReader = {
+                id: Date.now(),
+                code: code,
+                name: document.getElementById('reader-name').value,
+                email: document.getElementById('reader-email').value,
+                phone: document.getElementById('reader-phone').value
+            };
+
+            readers.push(newReader);
+            saveData(DB_KEYS.READERS, readers);
+            this.reset();
+            updateAllViews();
+            alert('Leitor cadastrado com sucesso!');
+        });
+
+        function deleteReader(id) {
+            if (confirm('Excluir este leitor?')) {
+                let readers = getData(DB_KEYS.READERS);
+                readers = readers.filter(r => r.id !== id);
+                saveData(DB_KEYS.READERS, readers);
+                updateAllViews();
+            }
+        }
+
+        function renderReaders() {
+            const readers = getData(DB_KEYS.READERS);
+            const session = JSON.parse(sessionStorage.getItem(DB_KEYS.SESSION));
+            const tbody = document.getElementById('readers-table-body');
+            tbody.innerHTML = '';
+
+            readers.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${r.code}</strong></td>
+                    <td>${r.name}</td>
+                    <td>${r.email}</td>
+                    <td>${r.phone}</td>
+                    <td class="${session.role !== 'admin' ? 'hidden' : ''}">
+                        <button onclick="deleteReader(${r.id})" class="btn btn-danger" style="padding: 0.4rem 0.7rem;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ==========================================
+        // EMPRÉSTIMOS, DEVOLUÇÕES E CÓDIGO DE BARRAS
+        // ==========================================
+        function setDefaultDates() {
+            const today = new Date();
+            const nextWeek = new Date();
+            nextWeek.setDate(today.getDate() + 7);
+
+            const todayStr = today.toISOString().split('T')[0];
+            const nextWeekStr = nextWeek.toISOString().split('T')[0];
+
+            document.getElementById('loan-date').value = todayStr;
+            document.getElementById('loan-due-date').value = nextWeekStr;
+            document.getElementById('scan-due-date').value = nextWeekStr;
+        }
+
+        // Alternar Modo Leitor de Código de Barras
+        function toggleBarcodeMode() {
+            const isBarcode = document.getElementById('barcode-mode-toggle').checked;
+            const barcodePanel = document.getElementById('barcode-loan-panel');
+            const manualPanel = document.getElementById('manual-loan-panel');
+
+            if (isBarcode) {
+                barcodePanel.classList.remove('hidden');
+                manualPanel.classList.add('hidden');
+                document.getElementById('scan-book-input').focus();
+            } else {
+                barcodePanel.classList.add('hidden');
+                manualPanel.classList.remove('hidden');
+            }
+        }
+
+        // Simulação de Leitor USB (Leitores enviam 'Enter' após ler o código)
+        document.getElementById('scan-book-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const barcode = this.value.trim();
+                const books = getData(DB_KEYS.BOOKS);
+                const loans = getData(DB_KEYS.LOANS);
+                const book = books.find(b => b.barcode === barcode);
+
+                if (!book) {
+                    alert('Livro não encontrado com este código de barras!');
+                    this.value = '';
+                    return;
+                }
+
+                // Verifica se existe empréstimo ativo para este livro (Devolução automática)
+                const activeLoan = loans.find(l => l.bookId === book.id && l.status === 'ativo');
+                if (activeLoan && book.availableQty === 0) {
+                    if (confirm(`O livro "${book.title}" está emprestado. Deseja registrar a DEVOLUÇÃO agora?`)) {
+                        returnBook(activeLoan.id);
+                        this.value = '';
+                    }
+                } else {
+                    // Pula para o campo do leitor
+                    document.getElementById('scan-reader-input').focus();
+                }
+            }
+        });
+
+        document.getElementById('scan-reader-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                processBarcodeAction();
+            }
+        });
+
+        function processBarcodeAction() {
+            const bookBarcode = document.getElementById('scan-book-input').value.trim();
+            const readerCode = document.getElementById('scan-reader-input').value.trim();
+            const dueDate = document.getElementById('scan-due-date').value;
+
+            const books = getData(DB_KEYS.BOOKS);
+            const readers = getData(DB_KEYS.READERS);
+
+            const book = books.find(b => b.barcode === bookBarcode);
+            const reader = readers.find(r => r.code === readerCode);
+
+            if (!book) return alert('Código de barras do livro inválido!');
+            if (!reader) return alert('Código/Matrícula do leitor inválido!');
+            if (book.availableQty <= 0) return alert('Não há exemplares disponíveis deste livro!');
+
+            createLoan(book.id, reader.id, new Date().toISOString().split('T')[0], dueDate);
+
+            document.getElementById('scan-book-input').value = '';
+            document.getElementById('scan-reader-input').value = '';
+            document.getElementById('scan-book-input').focus();
+        }
+
+        // Empréstimo Manual
+        document.getElementById('loan-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const readerId = parseInt(document.getElementById('loan-reader').value);
+            const bookId = parseInt(document.getElementById('loan-book').value);
+            const loanDate = document.getElementById('loan-date').value;
+            const dueDate = document.getElementById('loan-due-date').value;
+
+            createLoan(bookId, readerId, loanDate, dueDate);
+            this.reset();
+            setDefaultDates();
+        });
+
+        function createLoan(bookId, readerId, loanDate, dueDate) {
+            const books = getData(DB_KEYS.BOOKS);
+            const loans = getData(DB_KEYS.LOANS);
+
+            const bookIndex = books.findIndex(b => b.id === bookId);
+            if (books[bookIndex].availableQty <= 0) {
+                alert('Livro indisponível no estoque!');
+                return;
+            }
+
+            // Diminui estoque disponível
+            books[bookIndex].availableQty -= 1;
+            saveData(DB_KEYS.BOOKS, books);
+
+            const newLoan = {
+                id: Date.now(),
+                bookId: bookId,
+                readerId: readerId,
+                loanDate: loanDate,
+                dueDate: dueDate,
+                status: 'ativo'
+            };
+
+            loans.push(newLoan);
+            saveData(DB_KEYS.LOANS, loans);
+            updateAllViews();
+            alert('Empréstimo registrado com sucesso!');
+        }
+
+        function returnBook(loanId) {
+            const loans = getData(DB_KEYS.LOANS);
+            const books = getData(DB_KEYS.BOOKS);
+
+            const loanIndex = loans.findIndex(l => l.id === loanId);
+            if (loanIndex === -1) return;
+
+            loans[loanIndex].status = 'devolvido';
+            loans[loanIndex].returnDate = new Date().toISOString().split('T')[0];
+
+            // Devolve ao estoque
+            const bookIndex = books.findIndex(b => b.id === loans[loanIndex].bookId);
+            if (bookIndex !== -1) {
+                books[bookIndex].availableQty += 1;
+            }
+
+            saveData(DB_KEYS.LOANS, loans);
+            saveData(DB_KEYS.BOOKS, books);
+            updateAllViews();
+            alert('Devolução registrada com sucesso!');
+        }
+
+        function renderLoans() {
+            const loans = getData(DB_KEYS.LOANS);
+            const books = getData(DB_KEYS.BOOKS);
+            const readers = getData(DB_KEYS.READERS);
+
+            const tbody = document.getElementById('loans-table-body');
+            const dashTbody = document.getElementById('dashboard-loans-table');
+            tbody.innerHTML = '';
+            dashTbody.innerHTML = '';
+
+            const today = new Date().toISOString().split('T')[0];
+
+            // Ordenar mais recentes primeiro
+            loans.slice().reverse().forEach(loan => {
+                const book = books.find(b => b.id === loan.bookId) || { title: 'Livro Removido', barcode: '-' };
+                const reader = readers.find(r => r.id === loan.readerId) || { name: 'Leitor Removido' };
+
+                const isOverdue = loan.status === 'ativo' && loan.dueDate < today;
+                let statusBadge = '';
+
+                if (loan.status === 'devolvido') {
+                    statusBadge = '<span class="badge badge-success">Devolvido</span>';
+                } else if (isOverdue) {
+                    statusBadge = '<span class="badge badge-danger">ATRASADO</span>';
+                } else {
+                    statusBadge = '<span class="badge badge-warning">Emprestado</span>';
+                }
+
+                const actionBtn = loan.status === 'ativo'
+                    ? `<button onclick="returnBook(${loan.id})" class="btn btn-success" style="padding: 0.4rem 0.7rem; font-size: 0.8rem;">
+                        <i class="fas fa-undo"></i> Devolver
+                       </button>`
+                    : '-';
+
+                // Tabela Geral de Empréstimos
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${book.barcode}</td>
+                    <td><strong>${book.title}</strong></td>
+                    <td>${reader.name}</td>
+                    <td>${formatDate(loan.loanDate)}</td>
+                    <td>${formatDate(loan.dueDate)}</td>
+                    <td>${statusBadge}</td>
+                    <td>${actionBtn}</td>
+                `;
+                tbody.appendChild(tr);
+
+                // Tabela do Dashboard (Apenas Ativos)
+                if (loan.status === 'ativo') {
+                    const dashTr = document.createElement('tr');
+                    dashTr.innerHTML = `
+                        <td><strong>${book.title}</strong></td>
+                        <td>${reader.name}</td>
+                        <td>${formatDate(loan.loanDate)}</td>
+                        <td style="${isOverdue ? 'color: var(--danger); font-weight: bold;' : ''}">${formatDate(loan.dueDate)}</td>
+                        <td>${statusBadge}</td>
+                        <td>${actionBtn}</td>
+                    `;
+                    dashTbody.appendChild(dashTr);
+                }
+            });
+        }
+
+        function populateSelects() {
+            const readers = getData(DB_KEYS.READERS);
+            const books = getData(DB_KEYS.BOOKS);
+
+            const readerSelect = document.getElementById('loan-reader');
+            const bookSelect = document.getElementById('loan-book');
+
+            readerSelect.innerHTML = '<option value="">Selecione um leitor...</option>';
+            readers.forEach(r => {
+                readerSelect.innerHTML += `<option value="${r.id}">${r.code} - ${r.name}</option>`;
+            });
+
+            bookSelect.innerHTML = '<option value="">Selecione um livro...</option>';
+            books.filter(b => b.availableQty > 0).forEach(b => {
+                bookSelect.innerHTML += `<option value="${b.id}">[${b.barcode}] ${b.title} (${b.availableQty} disp.)</option>`;
+            });
+        }
+
+        // ==========================================
+        // PAINEL ADMINISTRADOR (EQUIPE)
+        // ==========================================
+        document.getElementById('staff-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const staff = getData(DB_KEYS.STAFF);
+            const user = document.getElementById('staff-user').value.trim();
+
+            if (staff.some(s => s.user === user)) {
+                alert('Este login já está em uso!');
+                return;
+            }
+
+            const newStaff = {
+                id: Date.now(),
+                name: document.getElementById('staff-name').value,
+                user: user,
+                pass: document.getElementById('staff-pass').value,
+                role: document.getElementById('staff-role').value
+            };
+
+            staff.push(newStaff);
+            saveData(DB_KEYS.STAFF, staff);
+            this.reset();
+            renderStaff();
+            alert('Usuário da equipe cadastrado!');
+        });
+
+        function deleteStaff(id) {
+            if (id === 1) return alert('O Administrador principal não pode ser excluído.');
+            if (confirm('Remover acesso deste funcionário?')) {
+                let staff = getData(DB_KEYS.STAFF);
+                staff = staff.filter(s => s.id !== id);
+                saveData(DB_KEYS.STAFF, staff);
+                renderStaff();
+            }
+        }
+
+        function renderStaff() {
+            const staff = getData(DB_KEYS.STAFF);
+            const tbody = document.getElementById('staff-table-body');
+            tbody.innerHTML = '';
+
+            staff.forEach(s => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${s.name}</td>
+                    <td><code>${s.user}</code></td>
+                    <td>
+                        <span class="badge ${s.role === 'admin' ? 'badge-danger' : 'badge-success'}">
+                            ${s.role === 'admin' ? 'Administrador' : 'Bibliotecário'}
+                        </span>
+                    </td>
+                    <td>
+                        ${s.id !== 1 ? `<button onclick="deleteStaff(${s.id})" class="btn btn-danger" style="padding: 0.4rem 0.7rem;"><i class="fas fa-trash"></i></button>` : 'Padrão'}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ==========================================
+        // DASHBOARD E UTILITÁRIOS
+        // ==========================================
+        function updateDashboardStats() {
+            const books = getData(DB_KEYS.BOOKS);
+            const readers = getData(DB_KEYS.READERS);
+            const loans = getData(DB_KEYS.LOANS);
+            const today = new Date().toISOString().split('T')[0];
+
+            const totalBooks = books.reduce((acc, b) => acc + b.totalQty, 0);
+            const activeLoans = loans.filter(l => l.status === 'ativo');
+            const overdueLoans = activeLoans.filter(l => l.dueDate < today);
+
+            document.getElementById('stat-total-books').innerText = totalBooks;
+            document.getElementById('stat-total-readers').innerText = readers.length;
+            document.getElementById('stat-active-loans').innerText = activeLoans.length;
+            document.getElementById('stat-overdue-loans').innerText = overdueLoans.length;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const [year, month, day] = dateStr.split('-');
+            return `${day}/${month}/${year}`;
+        }
+
+        function updateAllViews() {
+            updateDashboardStats();
+            renderBooks();
+            renderReaders();
+            renderLoans();
+            populateSelects();
+            renderStaff();
+        }
+
+        // Inicialização
+        window.onload = function() {
+            initDB();
+            setDefaultDates();
+            document.getElementById('current-date').innerText = new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            checkSession();
+        };
+    </script>
+</body>
+</html>
